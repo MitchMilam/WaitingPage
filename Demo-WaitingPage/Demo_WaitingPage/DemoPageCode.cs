@@ -54,7 +54,9 @@ namespace Demo_WaitingPage
                 }
             };
 
-            MainView = stack;
+            LoadingMessage = "Loading...";
+
+            Content = stack;
         }
 
         protected override async void OnAppearing()

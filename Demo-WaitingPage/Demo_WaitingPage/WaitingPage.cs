@@ -5,8 +5,8 @@ namespace Demo_WaitingPage
     public class WaitingPage : ContentPage
     {
         public static readonly BindableProperty IsWaitingProperty = BindableProperty.Create("IsWaiting", typeof(bool), typeof(WaitingPage), false);
+        public static readonly BindableProperty LoadingMessageProperty = BindableProperty.Create("LoadingMessage", typeof(string), typeof(WaitingPage), string.Empty);
 
-        /// <value><c>true</c> if rounded; otherwise, <c>false</c>.</value>
         public bool IsWaiting
         {
             get
@@ -25,14 +25,39 @@ namespace Demo_WaitingPage
                 }
             }
         }
+        public string LoadingMessage
+        {
+            get
+            {
+                return (string)GetValue(LoadingMessageProperty);
+            }
+            set
+            {
+                SetValue(LoadingMessageProperty, value);
+            }
+        }
 
-        public View MainView { get; set; }
+        private ContentView WaitingPageContent;
+        public new View Content
+        {
+            set
+            {
+                WaitingPageContent.Content = value;
+            }
+        }
+
         public ActivityIndicator Indicator { get; set; }
 
         private Grid Layout;
+        private Frame FrameLayout;
 
         public WaitingPage()
         {
+            WaitingPageContent = new ContentView
+            {
+                Content = null,
+            };
+
             Layout = new Grid
             {
                 VerticalOptions = LayoutOptions.Fill,
@@ -44,10 +69,10 @@ namespace Demo_WaitingPage
             Layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
             Layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            Content = Layout;
+            base.Content = Layout;
         }
 
-        protected override async void OnAppearing()
+        protected override void OnAppearing()
         {
             base.OnAppearing();
 
@@ -68,8 +93,37 @@ namespace Demo_WaitingPage
                 ShowIndicator();
             }
 
-            Layout.Children.Add(MainView, 0, 0);
-            Layout.Children.Add(Indicator, 0, 0);
+            Layout.Children.Add(WaitingPageContent, 0, 0);
+
+            if (!string.IsNullOrEmpty(LoadingMessage))
+            {
+                FrameLayout = new Frame
+                {
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center,
+                    BackgroundColor = Color.White,
+                    OutlineColor = Color.Black,
+                    HasShadow = false,
+                    Content = new StackLayout
+                    {
+                        Spacing = 15,
+                        Children = {
+                            new Label
+                            {
+                                Text = LoadingMessage,
+                                FontSize = Device.GetNamedSize(NamedSize.Small, this)
+                            }, 
+                            Indicator
+                        }
+                    }
+                };
+
+                Layout.Children.Add(FrameLayout, 0, 0);
+            }
+            else
+            {
+                Layout.Children.Add(Indicator, 0, 0);
+            }
         }
 
         private void ShowIndicator()
@@ -77,6 +131,11 @@ namespace Demo_WaitingPage
             if (Indicator == null)
             {
                 return;
+            }
+
+            if (FrameLayout != null)
+            {
+                FrameLayout.IsVisible = true;
             }
 
             Indicator.IsRunning = true;
@@ -87,7 +146,12 @@ namespace Demo_WaitingPage
             if (Indicator == null)
             {
                 return;
-            } 
+            }
+
+            if (FrameLayout != null)
+            {
+                FrameLayout.IsVisible = false;
+            }
 
             Indicator.IsRunning = false;
         }
