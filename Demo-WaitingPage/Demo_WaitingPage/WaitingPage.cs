@@ -48,7 +48,7 @@ namespace Demo_WaitingPage
 
         public ActivityIndicator Indicator { get; set; }
 
-        private Grid Layout;
+        private Grid ContentLayout;
         private Frame FrameLayout;
 
         public WaitingPage()
@@ -58,7 +58,7 @@ namespace Demo_WaitingPage
                 Content = null,
             };
 
-            Layout = new Grid
+            ContentLayout = new Grid
             {
                 VerticalOptions = LayoutOptions.Fill,
                 HorizontalOptions = LayoutOptions.Fill,
@@ -66,10 +66,10 @@ namespace Demo_WaitingPage
                 BackgroundColor = Color.Transparent,
             };
 
-            Layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            Layout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            ContentLayout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            ContentLayout.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            base.Content = Layout;
+            base.Content = ContentLayout;
         }
 
         protected override void OnAppearing()
@@ -93,7 +93,7 @@ namespace Demo_WaitingPage
                 ShowIndicator();
             }
 
-            Layout.Children.Add(WaitingPageContent, 0, 0);
+            View finalIndicator = Indicator;
 
             if (!string.IsNullOrEmpty(LoadingMessage))
             {
@@ -101,7 +101,7 @@ namespace Demo_WaitingPage
                 {
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
-                    BackgroundColor = Color.White,
+                    BackgroundColor = Color.FromRgba(255, 255, 255, 1.0),   // White, Opaque. Required for Android
                     OutlineColor = Color.Black,
                     HasShadow = false,
                     Content = new StackLayout
@@ -110,6 +110,7 @@ namespace Demo_WaitingPage
                         Children = {
                             new Label
                             {
+                                TextColor = Color.Black,
                                 Text = LoadingMessage,
                                 FontSize = Device.GetNamedSize(NamedSize.Small, this)
                             }, 
@@ -118,42 +119,52 @@ namespace Demo_WaitingPage
                     }
                 };
 
-                Layout.Children.Add(FrameLayout, 0, 0);
+                finalIndicator = FrameLayout;
             }
-            else
+
+            // Each layout engine is different. This block helps ensure
+            // that the indicator shows on top of the main content.
+            switch (Device.OS)
             {
-                Layout.Children.Add(Indicator, 0, 0);
+                case TargetPlatform.iOS:
+                    ContentLayout.Children.Add(WaitingPageContent, 0, 0);
+                    ContentLayout.Children.Add(finalIndicator, 0, 0);
+                    break;
+                case TargetPlatform.Android:
+                    ContentLayout.Children.Add(finalIndicator, 0, 0);
+                    ContentLayout.Children.Add(WaitingPageContent, 0, 0);
+                    break;
+                case TargetPlatform.WinPhone:       // TODO: Verify
+                    ContentLayout.Children.Add(WaitingPageContent, 0, 0);
+                    ContentLayout.Children.Add(finalIndicator, 0, 0);
+                    break;
             }
         }
 
         private void ShowIndicator()
         {
-            if (Indicator == null)
+            if (Indicator != null)
             {
-                return;
+                Indicator.IsRunning = true;
             }
 
             if (FrameLayout != null)
             {
                 FrameLayout.IsVisible = true;
             }
-
-            Indicator.IsRunning = true;
         }
 
         private void HideIndicator()
         {
-            if (Indicator == null)
+            if (Indicator != null)
             {
-                return;
+                Indicator.IsRunning = false;
             }
 
             if (FrameLayout != null)
             {
                 FrameLayout.IsVisible = false;
             }
-
-            Indicator.IsRunning = false;
         }
     }
 }
