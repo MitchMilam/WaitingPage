@@ -55,6 +55,7 @@ namespace Demo_WaitingPage
             };
 
             LoadingMessage = "Loading...";
+            ShowLoadingMessage = true;
 
             Content = stack;
         }

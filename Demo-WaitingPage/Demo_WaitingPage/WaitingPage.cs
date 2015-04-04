@@ -5,7 +5,8 @@ namespace Demo_WaitingPage
     public class WaitingPage : ContentPage
     {
         public static readonly BindableProperty IsWaitingProperty = BindableProperty.Create("IsWaiting", typeof(bool), typeof(WaitingPage), false);
-        public static readonly BindableProperty LoadingMessageProperty = BindableProperty.Create("LoadingMessage", typeof(string), typeof(WaitingPage), string.Empty);
+        public static readonly BindableProperty LoadingMessageProperty = BindableProperty.Create("LoadingMessage", typeof(string), typeof(WaitingPage), "Loading...");
+        public static readonly BindableProperty ShowLoadingMessageProperty = BindableProperty.Create("ShowLoadingMessage", typeof(bool), typeof(WaitingPage), false);
 
         public bool IsWaiting
         {
@@ -25,6 +26,7 @@ namespace Demo_WaitingPage
                 }
             }
         }
+
         public string LoadingMessage
         {
             get
@@ -36,8 +38,18 @@ namespace Demo_WaitingPage
                 SetValue(LoadingMessageProperty, value);
             }
         }
+        public bool ShowLoadingMessage
+        {
+            get
+            {
+                return (bool)GetValue(ShowLoadingMessageProperty);
+            }
+            set
+            {
+                SetValue(ShowLoadingMessageProperty, value);
+            }
+        }
 
-        private ContentView WaitingPageContent;
         public new View Content
         {
             set
@@ -48,6 +60,7 @@ namespace Demo_WaitingPage
 
         public ActivityIndicator Indicator { get; set; }
 
+        private ContentView WaitingPageContent;
         private Grid ContentLayout;
         private Frame FrameLayout;
 
@@ -62,7 +75,7 @@ namespace Demo_WaitingPage
             {
                 VerticalOptions = LayoutOptions.Fill,
                 HorizontalOptions = LayoutOptions.Fill,
-                Padding = new Thickness(0, 0, 0, 8),
+                Padding = new Thickness(0, 0, 0, 0),
                 BackgroundColor = Color.Transparent,
             };
 
@@ -95,7 +108,7 @@ namespace Demo_WaitingPage
 
             View finalIndicator = Indicator;
 
-            if (!string.IsNullOrEmpty(LoadingMessage))
+            if (ShowLoadingMessage)
             {
                 FrameLayout = new Frame
                 {
