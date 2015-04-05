@@ -54,9 +54,11 @@ namespace Demo_WaitingPage
                 }
             };
 
-            LoadingMessage = "Loading...";
+            //LoadingMessage = "Loading...";
+            ShowLoadingFrame = true;
             ShowLoadingMessage = true;
-
+            ShadeBackground = true;
+            WaitingOrientation = StackOrientation.Vertical;
             Content = stack;
         }
 
