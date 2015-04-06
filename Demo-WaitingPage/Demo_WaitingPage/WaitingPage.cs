@@ -112,6 +112,7 @@ namespace Demo_WaitingPage
         private Grid ContentLayout;
         private Frame FrameLayout;
         private Color ShadedBackgroundColor = Color.Black.MultiplyAlpha(0.2);
+        private Color UnshadedBackgroundColor = Color.Transparent;
 
         public WaitingPage()
         {
@@ -125,7 +126,7 @@ namespace Demo_WaitingPage
                 VerticalOptions = LayoutOptions.Fill,
                 HorizontalOptions = LayoutOptions.Fill,
                 Padding = new Thickness(0, 0, 0, 0),
-                BackgroundColor = ShadeBackground ? ShadedBackgroundColor : Color.Transparent,
+                BackgroundColor = ShadeBackground ? ShadedBackgroundColor : UnshadedBackgroundColor,
             };
 
             ContentLayout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
@@ -218,9 +219,9 @@ namespace Demo_WaitingPage
                 OutlineColor = ShowLoadingFrame ? Color.Black : Color.Transparent,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
+                IsVisible = IsWaiting,
                 HasShadow = false,
                 Content = stack,
-                IsVisible = IsWaiting,
             };
         }
 
@@ -236,7 +237,7 @@ namespace Demo_WaitingPage
                 FrameLayout.IsVisible = true;
             }
 
-            ContentLayout.BackgroundColor = ShadeBackground ? ShadedBackgroundColor : Color.Transparent;
+            ContentLayout.BackgroundColor = ShadeBackground ? ShadedBackgroundColor : UnshadedBackgroundColor;
         }
 
         private void HideIndicator()
@@ -251,7 +252,7 @@ namespace Demo_WaitingPage
                 FrameLayout.IsVisible = false;
             }
 
-            ContentLayout.BackgroundColor = Color.Transparent;
+            ContentLayout.BackgroundColor = UnshadedBackgroundColor;
         }
     }
 }
