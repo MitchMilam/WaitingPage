@@ -65,7 +65,7 @@ namespace Demo_WaitingPage
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            IsWaiting = true;
+            //IsWaiting = false;
         }
     }
 }

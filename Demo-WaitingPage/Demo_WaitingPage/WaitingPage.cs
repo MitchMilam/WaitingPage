@@ -220,6 +220,7 @@ namespace Demo_WaitingPage
                 VerticalOptions = LayoutOptions.Center,
                 HasShadow = false,
                 Content = stack,
+                IsVisible = IsWaiting,
             };
         }
 
