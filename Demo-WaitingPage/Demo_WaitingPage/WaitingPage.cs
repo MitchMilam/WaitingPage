@@ -2,14 +2,6 @@
 
 namespace Demo_WaitingPage
 {
-    //public enum WaitingFrameOrientation
-    //{
-    //    /// <summary>StackLayout should be vertically oriented.</summary>
-    //    Vertical,
-    //    /// <summary>StackLayout should be horizontally oriented.</summary>
-    //    Horizontal
-    //}
-
     public class WaitingPage : ContentPage
     {
         public static readonly BindableProperty IsWaitingProperty = BindableProperty.Create("IsWaiting", typeof(bool), typeof(WaitingPage), false);
@@ -112,7 +104,8 @@ namespace Demo_WaitingPage
         private Grid ContentLayout;
         private Frame FrameLayout;
         private Color ShadedBackgroundColor = Color.Black.MultiplyAlpha(0.2);
-        private Color UnshadedBackgroundColor = Color.Transparent;
+        private Color TransparentBackgroundColor = Color.Transparent;
+        private Color WhiteBackgroundColor = Color.FromRgba(255, 255, 255, 1.0);    // Background color of White, Opaque is required for Android
 
         public WaitingPage()
         {
@@ -126,7 +119,7 @@ namespace Demo_WaitingPage
                 VerticalOptions = LayoutOptions.Fill,
                 HorizontalOptions = LayoutOptions.Fill,
                 Padding = new Thickness(0, 0, 0, 0),
-                BackgroundColor = ShadeBackground ? ShadedBackgroundColor : UnshadedBackgroundColor,
+                BackgroundColor = ShadeBackground ? ShadedBackgroundColor : TransparentBackgroundColor,
             };
 
             ContentLayout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
@@ -158,23 +151,8 @@ namespace Demo_WaitingPage
 
             BuildIndicatorFrame();
 
-            // Each layout engine is different. This block helps ensure
-            // that the indicator shows on top of the main content.
-            switch (Device.OS)
-            {
-                case TargetPlatform.iOS:
-                    ContentLayout.Children.Add(WaitingPageContent, 0, 0);
-                    ContentLayout.Children.Add(FrameLayout, 0, 0);
-                    break;
-                case TargetPlatform.Android:
-                    ContentLayout.Children.Add(FrameLayout, 0, 0);
-                    ContentLayout.Children.Add(WaitingPageContent, 0, 0);
-                    break;
-                case TargetPlatform.WinPhone:       // TODO: Verify
-                    ContentLayout.Children.Add(WaitingPageContent, 0, 0);
-                    ContentLayout.Children.Add(FrameLayout, 0, 0);
-                    break;
-            }
+            ContentLayout.Children.Add(WaitingPageContent, 0, 0);
+            ContentLayout.Children.Add(FrameLayout, 0, 0);
         }
 
         private void BuildIndicatorFrame()
@@ -183,7 +161,7 @@ namespace Demo_WaitingPage
             {
                 TextColor = Color.Black,
                 Text = LoadingMessage,
-                FontSize = Device.GetNamedSize(NamedSize.Small, this)
+                FontSize = Device.GetNamedSize(NamedSize.Small, typeof(Label))
             };
 
             var stack = new StackLayout
@@ -210,13 +188,12 @@ namespace Demo_WaitingPage
                         stack.Children.Add(loadingLabel);
                     }
                     break;
-            };
-
-            // Background color of White, Opaque is required for Android
+            }
+           
             FrameLayout = new Frame
             {
-                BackgroundColor = ShowLoadingFrame ? Color.FromRgba(255, 255, 255, 1.0) : Color.Transparent,
-                OutlineColor = ShowLoadingFrame ? Color.Black : Color.Transparent,
+                BackgroundColor = ShowLoadingFrame ? WhiteBackgroundColor : TransparentBackgroundColor,
+                OutlineColor = ShowLoadingFrame ? Color.Black : TransparentBackgroundColor,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 IsVisible = IsWaiting,
@@ -237,7 +214,7 @@ namespace Demo_WaitingPage
                 FrameLayout.IsVisible = true;
             }
 
-            ContentLayout.BackgroundColor = ShadeBackground ? ShadedBackgroundColor : UnshadedBackgroundColor;
+            ContentLayout.BackgroundColor = ShadeBackground ? ShadedBackgroundColor : TransparentBackgroundColor;
         }
 
         private void HideIndicator()
@@ -252,7 +229,7 @@ namespace Demo_WaitingPage
                 FrameLayout.IsVisible = false;
             }
 
-            ContentLayout.BackgroundColor = UnshadedBackgroundColor;
+            ContentLayout.BackgroundColor = TransparentBackgroundColor;
         }
     }
 }
